@@ -1,5 +1,5 @@
 
-obj$sample_condition<-paste(obj$sample, obj$sample, sep=".")
+obj$sample_condition<-paste(obj$sample, obj$condition, sep=".")
 
 Idents(obj)<-"sample_condition"
 dotplot<-DotPlot(obj, features = "Thy1")
