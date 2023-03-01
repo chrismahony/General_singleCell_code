@@ -1,2 +1,2 @@
 du -hc -d 1 #calculate space in folders one level down
-ls -a  #show hidden directories
+ls -h  #show hidden directories
