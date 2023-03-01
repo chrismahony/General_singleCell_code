@@ -1,6 +1,6 @@
 
 
-setwd("your_path") #must contain dirs with barcodes.tsv.gz, matrix.mtx.gz, features.tsv.gz
+setwd("your_path") #must contain dirs (one for each sample) with barcodes.tsv.gz, matrix.mtx.gz, features.tsv.gz
 
 
 data.10x = list()
