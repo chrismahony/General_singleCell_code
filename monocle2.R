@@ -5,7 +5,7 @@ fibs <- fibs %>%
     FindVariableFeatures() %>%
     RunPCA(verbose = FALSE)
 
-#choose good cluster res
+#choose good cluster res and caclulate markers
 Idents(fibs)<-'endo_sub.cluster.0.1'
 
 all_markers_fibs<-FindAllMarkers(fibs, only.pos = T)
@@ -14,6 +14,7 @@ all_markers_fibs %>%
     group_by(cluster) %>%
     top_n(n = 50, wt = avg_log2FC) -> all_markers_fibs_top50
 
+#monocle2
 library(monocle)
 data <- GetAssayData(fibs[["RNA"]], slot="data")
 
@@ -32,10 +33,11 @@ rna_fibros <- newCellDataSet(data,
                          expressionFamily = negbinomial.size())
 
 
-
+#split into groups/condition (if required)
 rna_fibros_g1 <- rna_fibros[,grepl("group1", rna_fibros@phenoData@data[["PCA_groups"]], ignore.case=TRUE)]
 rna_fibros_g2 <- rna_fibros[,grepl("group2", rna_fibros@phenoData@data[["PCA_groups"]], ignore.case=TRUE)]
 
+#pseuodtime ordering and plotting
 rna_fibros_g1  <- estimateSizeFactors(rna_fibros_g1)
 rna_fibros_g1 <- setOrderingFilter(rna_fibros_g1, all_markers_fibs_top50$gene)
 rna_fibros_g1 <- reduceDimension(rna_fibros_g1, max_components = 2, method = 'DDRTree')
