@@ -1,8 +1,8 @@
 #paste together all the varibles you are interested in
-v3$global_sample_condition<-paste(v3$global , v3$sample, v3$condition, sep=".")
+v3$global_sample<-paste(v3$global , v3$sample, sep=".")
 
 #AggregateExpression will sum counts when slot is set to "counts"
-cts_v3<-AggregateExpression(v3, group.by = c("global_sample_condition"), assays = "RNA", slot = "counts", return.seurat = F)
+cts_v3<-AggregateExpression(v3, group.by = c("global_sample"), assays = "RNA", slot = "counts", return.seurat = F)
 
 #get meta_data read for dseq2
 cts_v3<-cts_v3$RNA
@@ -13,11 +13,11 @@ meta_data<-as.data.frame(meta_data)
 library(splitstackshape)
 meta_data$to_split<-meta_data$meta_data
 meta_data<-cSplit(meta_data, splitCols = "to_split", sep=".")
-colnames(meta_data)<-c("all_deatils", "global", "sample", "condition")
-meta_data$sample_global<-paste(meta_data$sample, meta_data$global, sep="_")
+colnames(meta_data)<-c("all_deatils", "global", "sample")
+#meta_data$sample_global<-paste(meta_data$sample, meta_data$global, sep="_")
 
 
-dds_v3<-DESeqDataSetFromMatrix(countData = cts_v3, colData=meta_data, design = ~ condition)
+dds_v3<-DESeqDataSetFromMatrix(countData = cts_v3, colData=meta_data, design = ~ global)
 keep<-rowSums(counts(dds_v3))>=10
 dds_v3<-dds_v3[keep,]
 
