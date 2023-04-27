@@ -68,3 +68,30 @@ cleaned.list[[i]] =ScaleData(object = cleaned.list[[i]]);
 cleaned.list[[i]] =FindVariableFeatures(object = cleaned.list[[i]]);
 cleaned.list[[i]] =RunPCA(object = cleaned.list[[i]], verbose = FALSE)
 }
+
+
+anchors <- FindIntegrationAnchors(object.list = cleaned.list, reduction = "rpca",   dims = 1:50)
+aggr <- IntegrateData(anchorset = anchors, dims = 1:50)
+VlnPlot(aggr, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
+aggr <- subset(aggr, subset = nFeature_RNA > 500 & percent.mt < 10)
+aggr <- FindVariableFeatures(aggr)
+aggr <- ScaleData(aggr, verbose = FALSE)
+aggr <- RunPCA(aggr, verbose = FALSE)
+aggr <- RunUMAP(aggr, dims = 1:50)
+
+aggr <- FindNeighbors(aggr, dims = 1:20)
+aggr <- FindClusters(aggr, resolution = c(0.01, 0.05, 0.1, 0.2, 0.3), graph.name = 'integrated_snn')
+Idents(aggr)<-'integrated_snn_res.0.01'  
+res0.01markers<-FindAllMarkers(aggr, only.pos = T)
+
+
+Idents(aggr)<-'integrated_snn_res.0.05'
+res0.05markers<-FindAllMarkers(aggr, only.pos = T)
+
+
+Idents(aggr)<-'integrated_snn_res.0.1'
+res0.1markers<-FindAllMarkers(aggr, only.pos = T)
+
+
+Idents(aggr)<-'integrated_snn_res.0.2'
+res0.2markers<-FindAllMarkers(aggr, only.pos = T)
