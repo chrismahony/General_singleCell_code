@@ -1,6 +1,35 @@
 library(gsfisher)
 
-expressed_genes<-rownames(fibro_only)
+getExpressedGenesFromSeuratObject <- function(seurat_object,
+                                              clusters,
+                                              min.pct=0.1)
+{
+  expressed <- c()
+  for(cluster in clusters)
+  {
+    # get genes detected in the cluster
+    cluster_cells <- names(seurat_object@active.ident[seurat_object@active.ident==cluster])
+    clust_pcts <- apply(seurat_object@assays$RNA@data[,cluster_cells],
+                        1, function(x) sum(x>0)/length(x))
+    
+    detected_in_clust <- names(clust_pcts[clust_pcts>min.pct])
+    
+    # get genes detected in the other cells
+    other_cells <- names(seurat_object@active.ident[seurat_object@active.ident!=cluster])
+    other_pcts <- apply(seurat_object@assays$RNA@data[,other_cells],
+                        1, function(x) sum(x>0)/length(x))
+    
+    detected_in_other_cells <- names(other_pcts[other_pcts>min.pct])
+    
+    expressed <- c(expressed, detected_in_clust, detected_in_other_cells)
+  }
+  expressed <- unique(expressed)
+  expressed
+}
+
+Idents(fibro_only)<-'integrated_snn_res.0.02'
+expressed_genes <- getExpressedGenesFromSeuratObject(fibro_only,levels(fibro_only@active.ident), min.pct=0.1)
+
 annotation_gs <- fetchAnnotation(species="mm", ensembl_version=NULL, ensembl_host=NULL)
 
 index <- match(markers$gene, annotation_gs$gene_name)
