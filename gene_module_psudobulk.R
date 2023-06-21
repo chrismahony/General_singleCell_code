@@ -1,4 +1,4 @@
-
+library(tidyverse)
 #create DESeq2 object first
 myel_hs$cluster_type<-paste(myel_hs$named, myel_hs$TYPE, sep=".")
 cts_all<-AggregateExpression(myel_hs, group.by = c("cluster_type"), assays = "RNA", slot = "counts", return.seurat = F)
