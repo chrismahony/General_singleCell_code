@@ -52,23 +52,28 @@ dds <- DESeq(dds, test = "Wald")
     
 print(resultsNames(dds))
 
-targetvar <- "cluster_data"
+targetvar <- "disease"
 
-comps <- resultsNames(dds)
-      ress <- lapply(comps[-1], function(cp) {
+
+comps1 <- data.frame(t(combn(unique(as.character(meta_data[[targetvar]])), 2)))
+      head(comps1)
+      
+      ress <- apply(comps1, 1, function(cp) {
         print(cp)
-        res <- data.frame(results(dds, name=cp))
+        res <- data.frame(results(dds, contrast=c(targetvar, cp[1], cp[2])))
         res[["gene"]] <- rownames(res)
-        res[["comparison"]] <- cp
+        res[["comparison"]] <- paste0(cp[1], "_vs_", cp[2])
         res
       })
+      
+      res1 <- Reduce(rbind, ress)
 
       
-res <- Reduce(rbind, ress)
-    
-head(res)      
 
-res %>% 
+    
+head(res1)      
+
+res1 %>% 
       filter(padj < 0.01) %>%
       mutate('score' = log2FoldChange*(-log10(pvalue))) %>%
       arrange(desc(abs(score))) -> subres
@@ -104,23 +109,27 @@ col_ann <- HeatmapAnnotation(df = ss_sm)
 
 
 nrow(scale_sub_vst_mat)
+
+#not really needed at this stage
+#draw(Heatmap(scale_sub_vst_mat, top_annotation = col_ann,
+#             col=colorRamp2(c(-2, 0, 2), c("blue", "white", "red")),
+#                  row_names_gp = gpar(fontsize = 4), 
+#                  cluster_columns = F, use_raster=F))
+
+
+ #for(v in colnames(ss_sm)) {
+#          plot(
+#            autoplot(prcomp(t(scale_sub_vst_mat)), 
+#                     data=ss_sm,
+#                     colour = v,
+#                     label = FALSE, 
+#                     label.size = 3) +
+#              theme_classic() +
+#              theme(legend.position = "bottom")
+#          )}
+
         
-draw(Heatmap(scale_sub_vst_mat, top_annotation = col_ann,
-             col=colorRamp2(c(-2, 0, 2), c("blue", "white", "red")),
-                  row_names_gp = gpar(fontsize = 4), 
-                  cluster_columns = F, use_raster=F))
-
-
- for(v in colnames(ss_sm)) {
-          plot(
-            autoplot(prcomp(t(scale_sub_vst_mat)), 
-                     data=ss_sm,
-                     colour = v,
-                     label = FALSE, 
-                     label.size = 3) +
-              theme_classic() +
-              theme(legend.position = "bottom")
-          )}
+topedges <- 0.05
 
         
 
