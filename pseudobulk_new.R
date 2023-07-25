@@ -139,17 +139,30 @@ res1 %>%
 
 library(ComplexHeatmap)
 
-#use vsd for <10 uniqe DEGs
-
-deseq2VST <- vst(dds, blind=T)
-
-feats <- unique(subres$gene)
-
-# Sub-set matrix to relevant features
-deseq2VST <- assay(deseq2VST)
-deseq2VST<-as.matrix(deseq2VST)
-sub_vst_mat <- deseq2VST[rownames(deseq2VST) %in% feats, ]
-scale_sub_vst_mat <- t(scale(t(sub_vst_mat)))
+if(length(unique(subres$gene)) > 10) {
+      vsd <- tryCatch({
+        vst(dds, blind=TRUE)
+      }, error=function(e) {
+        message(e)
+        print(e)
+        return(NULL)
+      })
+      
+      if(!is.null(vsd)) {
+        print(dim(assay(vsd)))
+        print(head(assay(vsd), 3))
+        vsd_mat <- assay(vsd)
+        
+        feats <- unique(subres$gene)
+        print(length(feats))
+        
+        # Sub-set matrix to relevant features
+        sub_vsd_mat <- vsd_mat[rownames(vsd_mat) %in% feats, ]
+        scale_sub_vsd <- t(scale(t(sub_vsd_mat)))
+        head(scale_sub_vsd)
+        dim(scale_sub_vsd)
+      }
+      }
 
 ss_sm <- meta_data[, c("model", "disease", "sample")]
 col_ann <- HeatmapAnnotation(df = ss_sm)
