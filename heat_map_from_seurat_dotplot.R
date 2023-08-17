@@ -22,3 +22,14 @@ dotplot <- dotplot[,-1] %>% as.matrix()
 library(ComplexHeatmap)
 
 Heatmap(dotplot)
+
+###improved colors and annotations
+cols2$col
+Idents(slide2_merged_f)<-'RNA_snn_res.0.3'
+ha2<-columnAnnotation(show_legend = FALSE,
+celltypes = levels(slide2_merged_f), 
+col = list(celltypes= c("0"="#D51F26", "1"="#272E6A",  "2"="#208A42", "3"="#89288F", "4"="#F47D2B", "5"="#FEE500", "6"="#8A9FD1", "7"="#C06CAB", "8"="#D8A767")))
+
+Heatmap(dotplot,cluster_rows = F, cluster_columns = F,top_annotation = ha2, col = circlize::colorRamp2(c(0, 0.1, 3), c('white', 'white', muted("blue"))), show_column_names = T, column_names_side = c("top"), column_names_rot = 0
+
+
