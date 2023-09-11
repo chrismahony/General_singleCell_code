@@ -67,6 +67,7 @@ dds <- scran::computeSumFactors(dds)
 print(dds)
 print(quantile(rowSums(counts(dds))))
 
+#mingenecount <- quantile(rowSums(counts(dds)), 0.5)
 mingenecount <- 200
 maxgenecount <- quantile(rowSums(counts(dds)), 0.999)
 dim(counts(dds))
