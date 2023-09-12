@@ -147,3 +147,27 @@ BX240_Lymphoid_EstablishedRA.txt_x_y_zoom<-BX240_Lymphoid_EstablishedRA.txt_x_y_
 ggplot(BX240_Lymphoid_EstablishedRA.txt_x_y_zoom, aes(x = Centroid.X.µm, y = Centroid.Y.µm, color=named)) +
     geom_point(size=1.3)+theme_classic()+scale_color_manual(values = c(cols))
 
+######ggplot of all images after annotation######
+
+names <- names(data_x_y)
+xy_list <- list()
+for (i in 1:length(data_x_y)) {
+xy_list[[i]]<-data_x_y[[names[[i]]]];
+}
+
+
+all_meta <- all@meta.data
+s_obj_meta <- list()
+ggplot_ls <- list()
+for (i in 1:length(names)) {
+s_obj_meta[[i]] <- all_meta[all_meta$orig.ident == names[[i]],];
+xy_list[[i]]$named <- s_obj_meta[[i]]$named_niches;
+cols <- ArchR::paletteDiscrete(s_obj_meta[[i]][, "named_niches"]);
+ggplot_ls[[i]] <- ggplot(xy_list[[i]], aes(x = Centroid.X.µm, y = Centroid.Y.µm, color=named)) +
+    geom_point(size=0.1)+theme_classic()+scale_color_manual(values = c(cols));
+print(ggplot_ls[[i]])
+  }
+
+
+
+
