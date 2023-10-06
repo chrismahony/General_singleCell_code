@@ -18,6 +18,9 @@ pt2 <- table(stia_ecotyper$cluster.name, stia_ecotyper$State)
 pt2 <- as.data.frame(pt2)
 pt2$Var1 <- as.character(pt2$Var1)
 
+cols <- as.data.frame(ArchR::paletteDiscrete(stia_ecotyper@meta.data[, "cluster.name"]))
+colnames(cols)<-"colors"
+
 ggplot(pt2, aes(x = Var2, y = Freq, fill = Var1))  + 
         geom_bar(stat = 'identity', position = position_fill())+
         theme(axis.text.y= element_blank(), axis.ticks.y = element_blank()) +
