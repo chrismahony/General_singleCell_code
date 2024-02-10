@@ -1,0 +1,41 @@
+#only run this if you are analysing mouse data 
+grn$Target <- gsub("(?<=\\b)([a-z])", "\\U\\1", tolower(grn$Target), perl=TRUE)
+
+#split the grn into tfs with regulons (target genes)
+tfs <- unique(grn$Source)
+grn_list <- list()
+for (i in 1:length(tfs)){
+grn_list[[i]] <- grn[grn$Source == tfs[[i]],]}
+
+#chnage name (easier for plotting down stream)
+name_tfs=paste("TF_", tfs, sep="")
+
+#add module to seurat obj
+for (i in 1:length(tfs)){
+stia2021_rna <- AddModuleScore(stia2021_rna, features = list(grn_list[[i]]$Target), name = name_tfs[[i]] )}
+
+#make heatmap
+to_plot <- colnames(stia2021_rna@meta.data)[grep("TF_", colnames(stia2021_rna@meta.data))]
+
+Idents(stia2021_rna) <- 'cluster.name' #chnage to the comparison you want todo
+levels(stia2021_rna)[-c(2,3,12)]
+stia2021_rna_f <- subset(stia2021_rna, idents=levels(stia2021_rna)[-c(2,3,12)])
+
+dotplot<-DotPlot(stia2021_rna, features= to_plot, idents = levels(stia2021_rna)[-c(2,3,5)])
+
+dotplot<-dotplot$data
+
+dotplot<-dotplot %>% 
+  select(-pct.exp, -avg.exp) %>%  
+  pivot_wider(names_from = id, values_from = avg.exp.scaled) %>% 
+  as.data.frame() 
+
+dotplot$features.plot<-unique(dotplot$features.plot)
+dotplot<-na.omit(dotplot)
+
+row.names(dotplot) <- dotplot$features.plot  
+dotplot <- dotplot[,-1] %>% as.matrix()
+
+library(ComplexHeatmap)
+
+Heatmap(dotplot, row_names_gp = gpar(fontsize = 5))
