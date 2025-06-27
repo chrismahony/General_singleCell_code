@@ -20,3 +20,7 @@ DimPlot(objs[[i]], raster=FALSE)
 }
 
 names(objs) <- names(umap_embeddings)
+
+objs[["stromal"]] %>% DimPlot()
+
+objs[["stromal"]] %>% DimPlot(group.by="subclusters")
