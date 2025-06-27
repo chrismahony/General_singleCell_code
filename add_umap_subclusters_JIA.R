@@ -19,4 +19,4 @@ DimPlot(objs[[i]], raster=FALSE)
 
 }
 
-names(objs <- names(umap_embeddings))
+names(objs) <- names(umap_embeddings)
